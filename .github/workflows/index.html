@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IUB CGPA Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                background-color: white;
+            }
+            .print-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+    <div class="max-w-6xl mx-auto my-10 bg-white shadow-lg rounded-lg print-container">
+
+<div class="mt-8 bg-white rounded-lg shadow-lg overflow-hidden no-print">
+    <div class="bg-blue-800 text-white p-4">
+        <h2 class="text-lg font-semibold">IUB Grading Calculator</h2>
+    </div>
+    </style>
+            <!-- Main Content -->
+            <div class="p-6">
+                <!-- Course Input Form -->
+                <div class="mb-8 bg-gray-50 p-4 rounded-lg no-print">
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">Add Course</h2>
+                    <form id="courseForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="courseName" class="block text-sm font-medium text-gray-700 mb-1">Course Name</label>
+                                <input type="text" id="courseName" placeholder="e.g., ENG 101" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label for="creditHours" class="block text-sm font-medium text-gray-700 mb-1">Credit Hours</label>
+                                <select id="creditHours" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="1">1 (Lab)</option>
+                                    <option value="2">2</option>
+                                    <option value="3" selected>3 (Standard)</option>
+                                    <option value="4">4</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="score" class="block text-sm font-medium text-gray-700 mb-1">Obtained Score (%)</label>
+                                <input type="number" id="score" min="0" max="100" step="0.01" placeholder="0-100" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                                Add Course
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Results Section -->
+                <div>
+                    <h2 class="text-xl font-semibold mb-4 text-gray-800">Grade Summary</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 border-b">Course</th>
+                                    <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 border-b">Credit Hours</th>
+                                    <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 border-b">Score (%)</th>
+                                    <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 border-b">Letter Grade</th>
+                                    <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 border-b">Grade Point</th>
+                                    <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 border-b">Total Points</th>
+                                    <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 border-b no-print">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="courseTableBody">
+                                <!-- Course rows will be added here -->
+                                <tr id="emptyCourseRow">
+                                    <td colspan="7" class="py-4 px-4 text-center text-gray-500">No courses added yet</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-gray-50 font-medium">
+                                    <td colspan="2" class="py-3 px-4 text-right">Total Credit Hours:</td>
+                                    <td colspan="3" id="totalCreditHours" class="py-3 px-4">0</td>
+                                    <td id="totalGradePoints" class="py-3 px-4">0</td>
+                                    <td class="no-print"></td>
+                                </tr>
+                                <tr class="bg-blue-50 font-bold">
+                                    <td colspan="2" class="py-3 px-4 text-right">CGPA:</td>
+                                    <td colspan="5" id="cgpa" class="py-3 px-4 text-lg">0.00</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="mt-8 flex flex-wrap gap-3 justify-end no-print">
+                    <button id="clearBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                        Clear All
+                    </button>
+                    <button id="printBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                        Print Results
+                    </button>
+                    <button id="downloadBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
+                        Download CSV
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="bg-gray-100 px-6 py-4 text-center text-gray-600 text-sm no-print">
+                <p>© 2025 IUB CGPA Calculator | Designed By Faruque Azam Alvee</p>
+            </div>
+        </div>
+        
+        <!-- Grade Scale Reference -->
+        <div class="mt-8 bg-white rounded-lg shadow-lg overflow-hidden no-print">
+            <div class="bg-blue-800 text-white p-4">
+                <h2 class="text-lg font-semibold">IUB Grading Scale Reference</h2>
+            </div>
+            <div class="p-4 overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="py-2 px-3 text-left text-sm font-semibold text-gray-700 border-b">Letter Grade</th>
+                            <th class="py-2 px-3 text-left text-sm font-semibold text-gray-700 border-b">Score Range (%)</th>
+                            <th class="py-2 px-3 text-left text-sm font-semibold text-gray-700 border-b">Grade Point (GP)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="py-2 px-3 border-b grade-A">A</td><td class="py-2 px-3 border-b">90 – 100</td><td class="py-2 px-3 border-b">4.0</td></tr>
+                        <tr><td class="py-2 px-3 border-b grade-A-minus">A−</td><td class="py-2 px-3 border-b">85 – 89</td><td class="py-2 px-3 border-b">3.7</td></tr>
+                        <tr><td class="py-2 px-3 border-b grade-B-plus">B+</td><td class="py-2 px-3 border-b">80 – 84</td><td class="py-2 px-3 border-b">3.3</td></tr>
+                        <tr><td class="py-2 px-3 border-b grade-B">B</td><td class="py-2 px-3 border-b">75 – 79</td><td class="py-2 px-3 border-b">3.0</td></tr>
+                        <tr><td class="py-2 px-3 border-b grade-B-minus">B−</td><td class="py-2 px-3 border-b">70 – 74</td><td class="py-2 px-3 border-b">2.7</td></tr>
+                        <tr><td class="py-2 px-3 border-b grade-C-plus">C+</td><td class="py-2 px-3 border-b">65 – 69</td><td class="py-2 px-3 border-b">2.3</td></tr>
+                        <tr><td class="py-2 px-3 border-b grade-C">C</td><td class="py-2 px-3 border-b">60 – 64</td><td class="py-2 px-3 border-b">2.0</td></tr>
+                        <tr><td class="py-2 px-3 border-b grade-C-minus">C−</td><td class="py-2 px-3 border-b">55 – 59</td><td class="py-2 px-3 border-b">1.7</td></tr>
+                        <tr><td class="py-2 px-3 border-b grade-D-plus">D+</td><td class="py-2 px-3 border-b">50 – 54</td><td class="py-2 px-3 border-b">1.3</td></tr>
+                        <tr><td class="py-2 px-3 border-b grade-D">D</td><td class="py-2 px-3 border-b">45 – 49</td><td class="py-2 px-3 border-b">1.0</td></tr>
+                        <tr><td class="py-2 px-3 grade-F">F</td><td class="py-2 px-3">Below 45</td><td class="py-2 px-3">0.0</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseForm = document.getElementById('courseForm');
+            const courseTableBody = document.getElementById('courseTableBody');
+            const emptyCourseRow = document.getElementById('emptyCourseRow');
+            const totalCreditHoursElement = document.getElementById('totalCreditHours');
+            const totalGradePointsElement = document.getElementById('totalGradePoints');
+            const cgpaElement = document.getElementById('cgpa');
+            const clearBtn = document.getElementById('clearBtn');
+            const printBtn = document.getElementById('printBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            let courses = [];
+            
+            // Load courses from localStorage if available
+            if (localStorage.getItem('iubCourses')) {
+                courses = JSON.parse(localStorage.getItem('iubCourses'));
+                updateTable();
+            }
+            
+            // Function to determine letter grade and grade point based on score
+            function getGradeInfo(score) {
+                if (score >= 90) return { letter: 'A', point: 4.0, class: 'grade-A' };
+                if (score >= 85) return { letter: 'A−', point: 3.7, class: 'grade-A-minus' };
+                if (score >= 80) return { letter: 'B+', point: 3.3, class: 'grade-B-plus' };
+                if (score >= 75) return { letter: 'B', point: 3.0, class: 'grade-B' };
+                if (score >= 70) return { letter: 'B−', point: 2.7, class: 'grade-B-minus' };
+                if (score >= 65) return { letter: 'C+', point: 2.3, class: 'grade-C-plus' };
+                if (score >= 60) return { letter: 'C', point: 2.0, class: 'grade-C' };
+                if (score >= 55) return { letter: 'C−', point: 1.7, class: 'grade-C-minus' };
+                if (score >= 50) return { letter: 'D+', point: 1.3, class: 'grade-D-plus' };
+                if (score >= 45) return { letter: 'D', point: 1.0, class: 'grade-D' };
+                return { letter: 'F', point: 0.0, class: 'grade-F' };
+            }
+            
+            // Function to update the table with courses
+            function updateTable() {
+                // Save to localStorage
+                localStorage.setItem('iubCourses', JSON.stringify(courses));
+                
+                // Clear table
+                while (courseTableBody.firstChild) {
+                    courseTableBody.removeChild(courseTableBody.firstChild);
+                }
+                
+                if (courses.length === 0) {
+                    courseTableBody.appendChild(emptyCourseRow);
+                    totalCreditHoursElement.textContent = '0';
+                    totalGradePointsElement.textContent = '0';
+                    cgpaElement.textContent = '0.00';
+                    return;
+                }
+                
+                let totalCreditHours = 0;
+                let totalPoints = 0;
+                
+                courses.forEach((course, index) => {
+                    const row = document.createElement('tr');
+                    row.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                    
+                    const gradeInfo = getGradeInfo(course.score);
+                    const totalCoursePoints = gradeInfo.point * course.creditHours;
+                    
+                    totalCreditHours += course.creditHours;
+                    totalPoints += totalCoursePoints;
+                    
+                    row.innerHTML = `
+                        <td class="py-3 px-4 border-b">${course.name}</td>
+                        <td class="py-3 px-4 border-b">${course.creditHours}</td>
+                        <td class="py-3 px-4 border-b">${course.score.toFixed(2)}</td>
+                        <td class="py-3 px-4 border-b ${gradeInfo.class}">${gradeInfo.letter}</td>
+                        <td class="py-3 px-4 border-b">${gradeInfo.point.toFixed(1)}</td>
+                        <td class="py-3 px-4 border-b">${totalCoursePoints.toFixed(2)}</td>
+                        <td class="py-3 px-4 border-b no-print">
+                            <button class="delete-btn text-red-600 hover:text-red-800" data-index="${index}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </td>
+                    `;
+                    
+                    courseTableBody.appendChild(row);
+                });
+                
+                // Update totals
+                totalCreditHoursElement.textContent = totalCreditHours.toString();
+                totalGradePointsElement.textContent = totalPoints.toFixed(2);
+                
+                // Calculate CGPA
+                const cgpa = totalPoints / totalCreditHours;
+                cgpaElement.textContent = cgpa.toFixed(2);
+                
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        courses.splice(index, 1);
+                        updateTable();
+                    });
+                });
+            }
+            
+            // Form submission handler
+            courseForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const courseName = document.getElementById('courseName').value.trim();
+                const creditHours = parseFloat(document.getElementById('creditHours').value);
+                const score = parseFloat(document.getElementById('score').value);
+                
+                // Validate score
+                if (score < 0 || score > 100) {
+                    alert('Score must be between 0 and 100');
+                    return;
+                }
+                
+                // Add course to array
+                courses.push({
+                    name: courseName,
+                    creditHours: creditHours,
+                    score: score
+                });
+                
+                // Update table
+                updateTable();
+                
+                // Reset form
+                courseForm.reset();
+                document.getElementById('creditHours').value = '3'; // Reset to default
+                document.getElementById('courseName').focus();
+            });
+            
+            // Clear all courses
+            clearBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear all courses?')) {
+                    courses = [];
+                    updateTable();
+                }
+            });
+            
+            // Print results
+            printBtn.addEventListener('click', function() {
+                window.print();
+            });
+            
+            // Download as CSV
+            downloadBtn.addEventListener('click', function() {
+                if (courses.length === 0) {
+                    alert('No courses to download');
+                    return;
+                }
+                
+                let csvContent = 'Course Name,Credit Hours,Score (%),Letter Grade,Grade Point,Total Points\n';
+                
+                courses.forEach(course => {
+                    const gradeInfo = getGradeInfo(course.score);
+                    const totalCoursePoints = gradeInfo.point * course.creditHours;
+                    
+                    csvContent += `"${course.name}",${course.creditHours},${course.score.toFixed(2)},"${gradeInfo.letter}",${gradeInfo.point.toFixed(1)},${totalCoursePoints.toFixed(2)}\n`;
+                });
+                
+                // Calculate totals
+                let totalCreditHours = courses.reduce((sum, course) => sum + course.creditHours, 0);
+                let totalPoints = courses.reduce((sum, course) => {
+                    const gradeInfo = getGradeInfo(course.score);
+                    return sum + (gradeInfo.point * course.creditHours);
+                }, 0);
+                let cgpa = totalPoints / totalCreditHours;
+                
+                csvContent += `\nTotal,${totalCreditHours},,,,${totalPoints.toFixed(2)}\n`;
+                csvContent += `CGPA,${cgpa.toFixed(2)}\n`;
+                
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'IUB_CGPA_Report.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        });
+    </script>
+    </div>
+</body>
+</html>
